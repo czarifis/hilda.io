@@ -32,11 +32,15 @@
   	     join visitors v 
          on pv.v_id = v.vid) AS joined_table
    GROUP BY time 
-   ORDER BY time ASC\textbf{\%>}
+   ORDER BY time ASC \textbf{\%>}
+\eat{\textbf{<\% let} min_time = readings[0].time \textbf{\%>}
+\textbf{<\% let} len = count(readings)-1 \textbf{\%>}
+\textbf{<\% let} min_time = readings[len].time \textbf{\%>}
+}
 \end{code}
 \vspace*{-0.3cm}
-\subcaption{Template instance}
-\label{figure:running-example:main-template-instance}
+\subcaption{Data retrieval}
+\label{figure:running-example:data-retrieval}
 \vspace*{0.3cm}
 \end{minipage}
 
@@ -48,8 +52,8 @@ readings = [
    \{visits: 25, time: '10:00'\},  ...]
 \end{code}
 \vspace*{-0.3cm}
-\subcaption{Template instance}
-\label{figure:running-example:main-template-instance}
+\subcaption{Query Result}
+\label{figure:running-example:query-result}
 \vspace*{0.3cm}
 \end{minipage}
 %
@@ -57,55 +61,26 @@ readings = [
 \hspace{1cm}
 \begin{minipage}[c]{8.5cm}
 \begin{code}
-\directive{template}{temp\_view()}
-  \directive{import}{functions}
-  \directive{import}{actions}
-
-  \textbf{<\% let} readings = select t.temp
-                    from db.temperature as t
-                    order by timestamp \textbf{\%>}
-  
   \directive{unit}{highcharts}
-  \{\eat{
-    chart: \{
-      renderTo: 'container',
-      zoomType: 'x'
-    \},}
-    title: \{ text: 'Temperature monitor' \}, \eat{
-    plotOptions: \{
-      series: \{
-        turboThreshold: 5000000
-      \}
-    \},
-    subtitle: \{
-      text: 'Using the experimental Highcharts Boost module'
-    \},
-    tooltip: \{
-      valueDecimals: 1
-    \},}    
-    series: [\{
-      data: [
-        \directive{for}{reading \textbf{in} readings}
-          \{
-            y    : \directive{print}{reading.temp},
-            color: \directive{print}{toHex(reading.temp, threshold)}
-          \}
-        \directive{end for}{}
-      ],
-      lineWidth: 1
-    \}],
-    \gl{<\% event} onSelection redrawSelected() \gl{\%>}
-  \}
-  \directive{end unit}{}
-  
-  \directive{unit}{slider}
   \{
-    min  : 0,
-    max  : 10000,
-    value: \directive{bind}{threshold = 65}
+    title: \{ text: 'Visitor information' \},
+    yAxis : \{ 
+      labels : [
+        \directive{for}{reading \textbf{in} readings} 
+          \directive{print}{reading.time} 
+        \directive{end for}{}],
+      min : \textbf{=<\%= min_time}
+      max : \textbf{=<\%= max_time}
+    \}
+    series: [\{
+      data: [ \directive{for}{reading \textbf{in} readings}
+          \{
+            y  : \directive{print}{reading.count}
+          \}
+        \directive{end for}{} ]
+    \}]
   \}
   \directive{end unit}{}
-\directive{end template}{}
 \end{code}
 \vspace*{-0.3cm}
 \subcaption{Template \texttt{temp\_view}}
@@ -126,16 +101,24 @@ Data retrieval is one aspect where {\projname} shines. The analyst is given the 
 
 
 
-First, our analyst needs to install and configure database drivers. This step will either introduce a dependency between the analyst and some system administrator, or the analyst will need to have the required access rights in order to perform the installation. The later can be a security concern or can lead to corrupted systems if not performed correctly. The complexity of this step increases as the types of databases our analyst wants to access increases. If for example we have data stored in a MongoDB and a SQL database, two drivers will need to be installed.
+First, our analyst needs to install and configure database drivers. This step will either introduce a dependency between the analyst and some system administrator, or the analyst will need to have the required access rights in order to perform the installation. The later can be a security concern or can lead to corrupted systems if not performed correctly. The complexity of this step increases as the number of different database systems, our analyst wants to access, increases. More specifically, for cases when an analyst needs to access data stored in a MongoDB and a MySQL database, two drivers will need to be installed.
 
-Once the system is configured, the analyst then needs to read lengthy documentation documents in order to properly issue queries to the databases via imperative code.
+Once the system is configured, the analyst then needs to read lengthy documentation documents in order to properly issue queries to the databases via imperative code, then consume the results, and potentially convert them into a format that assists in data processing. Lastly, the analyst will have to convert the format of the data again in order to feed them into the respective visualization library.
 
 Finally, when implemented in a Jupyter notebook, the analyst's credentials for the database server might lie on plain sight to anyone who has access to the notebook, disrupting the valuable ease of results communication through notebooks.
 
-{\projname} addresses each one of the aforementioned imperative code issues efficiently: The analyst generates a configuration file, containing information required for obtaining a successful connection with the respective database systems. Figure \ref{figure:source-config-file} shows an example of a configuration file for accessing a postgres database. It contains the type of the database system, the host name, port and the credentials that will be used obtaining a connection. Additionally, it contains the database tables that will be accessible by queries, only the tables that are explicitly defined in the configuration file will be accessible by \projname. After this configuration file is imported, by using the user interface of \projname\, it will be encrypted so that this information is no longer visible to the notebook reader. Furthermore, as an added benefit, the schema of the accessible tables will be displayed in the UI, in order to allow the notebook user to get a quick glimpse, when generating the queries. For database systems that do not contain schema, \projname\ will simply display a small portion of the dataset instead.
+{\projname} addresses each one of the aforementioned imperative code issues efficiently: The analyst generates a configuration file, containing information required for establishing a successful connection with the respective database systems. Figure \ref{figure:source-config-file} shows an example of the configuration file that is used for connecting to a postgres database which contains the data that will by used in our analysis. The configuration file must contain the type of the database system, the host name, port and the credentials that will be used for obtaining a connection. Additionally, it contains the database tables that will be accessible by queries, only the tables that are explicitly defined in the configuration file will be accessible by \projname. After this configuration file is imported, (which is done directly from the notebook's UI), it will be hidden from the UI and encrypted so that this information is no longer visible to the notebook reader.  Furthermore, as an added benefit, the schema of the accessible tables will be displayed on the UI, thus allowing the notebook user to get a quick glimpse on it, when generating queries. 
 
- \remark{Diko sas!}
+Once this step is done, the analyst is free to issue queries in order to access database systems. Figure \ref{figure:running-example:data-retrieval} contains a sample query that is used in our analysis. The query joins the two tables: $visitors$ and $page\_views$ on the id of the visitor, then groups the result on the $time$ attribute and runs a $count$ aggregate to count the visitors per unit of time. Lastly, it sorts the resulting dataset by units of time in ascending order. Figure \ref{figure:running-example:query-result} shows the result of the query. Notice that the result has been converted into a JSON array by \projname\. In the next section we will show how to use this dataset to generate our first visualization, without the use of any imperative logic.
 
-As a result, credentials are no longer directly visible to the notebook reader. As an added benefit, these configuration files contain a description of the schema of each table, allowing the notebook user to get a quick glimpse of the database's structure as soon as connection is established.
+\subsection{Source Wrappers}
+\label{subsection:source-wrappers}
 
-\remark{Technical details by Costas Z. follow. All rise.}
+
+\projname\ contains a set of source wrappers that enables data retrieval from various different sources both relational and non-relational. These source wrappers come pre-installed with \projname\ so that the notebook user will not have to take on any system administrator duties. The user simple provides the configuration file and writes the query in the language supported by each database system. The source wrapper uses that information to connect to the respective database system, retrieve the requested data, convert it into JSON format and make it available to the user. For database systems that do not contain tables with schema, the notebook user has to provide the appropriate construct under the "expose" attribute of the configuration file (i.e if the user accesses a MongoDB database, she will have to declare the collections of documents that will be consumable from the notebook). Additionally, in cases when the accessed database system does not have a schema the notebook will simply display a small portion of the dataset, thus assisting the notebook user to compose queries.
+
+\costas{Maybe put the last two sentences  in a side-note?}
+
+
+
+
