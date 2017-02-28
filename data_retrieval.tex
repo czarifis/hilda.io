@@ -1,0 +1,18 @@
+\section{Data Retrieval}
+\label{section:dataretrieval}
+
+\remark{It might be a good idea to merge these 3 sections into 1 called ``Walkthrough example'' or something like that. Depends on how large these sections become.}
+
+Data retrieval is one aspect where {\projname} shines. The analyst is given the ability to write clean and readable database queries (?? - Is there a better name - ??) in order to retrieve data from the remote server. In a Python implementation, analysts need to perform a series of tasks before being able to retrieve data. Some of these tasks potentially fall way beyond the skill set of the average data analyst. 
+
+First, our analyst needs to install and configure database drivers. This step will either introduce a dependency between the analyst and some system administrator, or the analyst will need to have the required access rights in order to perform the installation. The later can be a security concern or can lead to corrupted systems if not performed correctly. The complexity of this step increases as the types of databases our analyst wants to access increases. If for example we have data stored in a MongoDB and a SQL database, two drivers will need to be installed.
+
+Once the system is configured, the analyst then needs to read lengthy documentation documents in order to properly issue queries to the databases via imperative code.
+
+Finally, when implemented in a Jupyter notebook, the analyst's credentials for the database server might lie on plain sight to anyone who has access to the notebook, disrupting the valuable ease of results communication through notebooks.
+
+{\projname} addresses each one of the aforementioned imperative code issues efficiently: The analyst generates a database configuration file, where \remark{Diko sas!}
+
+As a result, credentials are no longer directly visible to the notebook reader. As an added benefit, these configuration files contain a description of the schema of each table, allowing the notebook user to get a quick glimpse of the database's structure as soon as connection is established.
+
+\remark{Technical details by Costas Z. follow. All rise.}
