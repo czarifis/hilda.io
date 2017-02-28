@@ -1,0 +1,141 @@
+\section{Data Retrieval}
+\label{section:dataretrieval}
+
+% Template and template instance figures
+\begin{figure*}
+\centering
+%
+%
+\begin{minipage}[c]{6cm}
+\begin{minipage}[c]{6cm}
+\begin{code}
+   sources : [ \{ 
+     driver   : "postgres", 
+     host     : "edu.db.domain", 
+     expose   : [ \{
+      schema : 'website_info', 
+      tables: [visits, page_views] \} ]
+     port     : 5432, 
+     username : "dbadmin" 
+     password : 'myP@ss'
+   \}] 
+\end{code}
+\subcaption{DB Access Configuration file}
+\label{figure:source-config-file}
+\end{minipage}
+%
+\begin{minipage}[c]{6cm}
+\begin{code}
+\textbf{<\% let} readings = 
+   SELECT count(time) as visits, time
+   FROM (SELECT * FROM page_views pv 
+  	     join visitors v 
+         on pv.v_id = v.vid) AS joined_table
+   GROUP BY time 
+   ORDER BY time ASC\textbf{\%>}
+\end{code}
+\vspace*{-0.3cm}
+\subcaption{Template instance}
+\label{figure:running-example:main-template-instance}
+\vspace*{0.3cm}
+\end{minipage}
+
+\begin{minipage}[c]{6cm}
+\begin{code}
+readings = [
+   \{visits: 15, time: '08:00'\}, 
+   \{visits: 10, time: '09:00'\},
+   \{visits: 25, time: '10:00'\},  ...]
+\end{code}
+\vspace*{-0.3cm}
+\subcaption{Template instance}
+\label{figure:running-example:main-template-instance}
+\vspace*{0.3cm}
+\end{minipage}
+%
+\end{minipage}
+\hspace{1cm}
+\begin{minipage}[c]{8.5cm}
+\begin{code}
+\directive{template}{temp\_view()}
+  \directive{import}{functions}
+  \directive{import}{actions}
+
+  \textbf{<\% let} readings = select t.temp
+                    from db.temperature as t
+                    order by timestamp \textbf{\%>}
+  
+  \directive{unit}{highcharts}
+  \{\eat{
+    chart: \{
+      renderTo: 'container',
+      zoomType: 'x'
+    \},}
+    title: \{ text: 'Temperature monitor' \}, \eat{
+    plotOptions: \{
+      series: \{
+        turboThreshold: 5000000
+      \}
+    \},
+    subtitle: \{
+      text: 'Using the experimental Highcharts Boost module'
+    \},
+    tooltip: \{
+      valueDecimals: 1
+    \},}    
+    series: [\{
+      data: [
+        \directive{for}{reading \textbf{in} readings}
+          \{
+            y    : \directive{print}{reading.temp},
+            color: \directive{print}{toHex(reading.temp, threshold)}
+          \}
+        \directive{end for}{}
+      ],
+      lineWidth: 1
+    \}],
+    \gl{<\% event} onSelection redrawSelected() \gl{\%>}
+  \}
+  \directive{end unit}{}
+  
+  \directive{unit}{slider}
+  \{
+    min  : 0,
+    max  : 10000,
+    value: \directive{bind}{threshold = 65}
+  \}
+  \directive{end unit}{}
+\directive{end template}{}
+\end{code}
+\vspace*{-0.3cm}
+\subcaption{Template \texttt{temp\_view}}
+\vspace*{0.3cm}
+\label{figure:running-example:main-template}
+\end{minipage}
+\caption{Template, template instance, and UAS configuration file for the running example}
+\end{figure*}
+
+
+\remark{It might be a good idea to merge these 3 sections into 1 called ``Walkthrough example'' or something like that. Depends on how large these sections become.}
+
+
+
+Data retrieval is one aspect where {\projname} shines. The analyst is given the ability to write clean and readable database queries (?? - Is there a better name - ??) \costas{yep that's how we call them...} in order to retrieve data from the remote server. In a Python implementation, analysts need to perform a series of tasks before being able to retrieve data. Some of these tasks potentially fall way beyond the skill set of the average data analyst. 
+
+\costas{We should also say that we simplify file imports. For cases, when the data analysts wants to use csv or json files from their local computer, they can use an import button, which is part of our UI, to upload them to the notebook server. After that step is completed we trigger a function that automatically converts this file to JSON and we assign it to a \projname\ variable, so that it can be used in the notebook. Currently, this task requires ssh-ing or scp-ing the files to the notebook server, and potentially moving files to the directive/file-system that is seen by the notebook, which also requires system administrator-linux knowledge}
+
+
+
+First, our analyst needs to install and configure database drivers. This step will either introduce a dependency between the analyst and some system administrator, or the analyst will need to have the required access rights in order to perform the installation. The later can be a security concern or can lead to corrupted systems if not performed correctly. The complexity of this step increases as the types of databases our analyst wants to access increases. If for example we have data stored in a MongoDB and a SQL database, two drivers will need to be installed.
+
+Once the system is configured, the analyst then needs to read lengthy documentation documents in order to properly issue queries to the databases via imperative code.
+
+Finally, when implemented in a Jupyter notebook, the analyst's credentials for the database server might lie on plain sight to anyone who has access to the notebook, disrupting the valuable ease of results communication through notebooks.
+
+{\projname} addresses each one of the aforementioned imperative code issues efficiently: The analyst generates a configuration file, containing information required for obtaining a successful connection with the respective database systems. Figure \ref{figure:source-config-file} shows an example of a configuration file for accessing a postgres database. It contains the type of the database system, the host name, port and the credentials that will be used obtaining a connection. Additionally, it contains the database tables that will be accessible by queries, only the tables that are explicitly defined in the configuration file will be accessible by \projname. After this configuration file is imported, by using the user interface of \projname\, it will be encrypted so that this information is no longer visible to the notebook reader. Furthermore, as an added benefit, the schema of the accessible tables will be displayed in the UI, in order to allow the notebook user to get a quick glimpse, when generating the queries. For database systems that do not contain schema, \projname\ will simply display a small portion of the dataset instead.
+
+ \remark{Diko sas!}
+
+As a result, credentials are no longer directly visible to the notebook reader. As an added benefit, these configuration files contain a description of the schema of each table, allowing the notebook user to get a quick glimpse of the database's structure as soon as connection is established.
+
+\remark{Technical details by Costas Z. follow. All rise.}
