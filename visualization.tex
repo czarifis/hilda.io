@@ -23,14 +23,15 @@
      ...
     FROM (SELECT * FROM page_views pv join visitors v 
           on pv.v_id = v.vid where time BETWEEN 
-          \textbf{<\%=min_time} and \textbf{<\%=max_time}) joined_data) jd
+          \directive{print}{min_time} and 
+          \directive{print}{max_time}) joined_data) jd
    GROUP BY agegroup  
    ORDER BY agegroup ASC \textbf{\%>}
 \end{code}
-\vspace*{-0.3cm}
+\vspace*{-0.4cm}
 \subcaption{Data retrieval}
 \label{figure:running-example:age-group-data-retrieval}
-\vspace*{0.3cm}
+\vspace*{0cm}
 \end{minipage}
 
 \begin{minipage}[c]{7.5cm}
@@ -40,10 +41,10 @@ age_groups = [
    \{age_group: '10 to 19', total: 67\},
    \{age_group: '20 to 29', total: 84\},  ...]
 \end{code}
-\vspace*{-0.3cm}
+\vspace*{-0.4cm}
 \subcaption{Query Result}
 \label{figure:running-example:age-group-query-result}
-\vspace*{0.3cm}
+\vspace*{-0.2cm}
 \end{minipage}
 %
 \end{minipage}
@@ -71,15 +72,15 @@ age_groups = [
   \}
   \directive{end unit}{}
 \end{code}
-\vspace*{-0.3cm}
+\vspace*{-0.4cm}
 \subcaption{Template \texttt{temp\_view}}
-\vspace*{0.3cm}
+\vspace*{0cm}
 \label{figure:running-example:age-group-template}
 \end{minipage}
 \end{minipage}
-
+\vspace*{-0.05cm}
 \caption{Template, template instance, and UAS configuration file for the running example}
-
+\vspace*{-0.3cm}
 \end{figure*}
 
 
