@@ -1,0 +1,11 @@
+\section{Interactive Interface}
+\label{section:interactive-interface}
+
+
+
+As the notebook reader interacts with a visualization the underlying visual unit triggers actions, which make the visualization behave in a certain way. For instance, as the user selects a particular region of the chart (shown in figure \costas{ADD FIGURE}) by dragging and dropping the mouse over that particular area, \eat{the visualization reacts to that event (or rather series of events) by zooming into the selected area}she causes the visualization to zoom into the selected area. This behavior is dictated by the underlying visual unit which listens for events (or rather series of events) and actively cause mutations to the visualization. Other than mutating the visual layer, these units also cause mutations on the unit state. In this particular case, zooming into a region, causes the min and max values, shown in Figure \ref{figure:running-example:unit-body}, in lines 5-6, to be updated accordingly. If the template language contains variables bound to these parts of the unit instance, \projname\ propagates that mutation to the respective variables. Furthermore a change propagation algorithm that operates on the entire notebook identifies all the statements that depend on those variables and triggers their re-evaluation.
+
+
+For instance, the template shown in Figure \ref{figure:first-running-example:main-template} contains two variables, namely $min\_time$ and $max\_time$, which are bound to the $min$ and $max$ unit instance variables respectively. These variables are later used in the parameterized query shown in Figure \ref{figure:running-example:age-group-data-retrieval} which retrieves the users that visited the website in the time-frame specified by those two variables, groups the result in age groups and sums up the hits made by each age group. Figure \ref{figure:running-example:age-group-query-result}, contains the result of that query. The result of this query is assigned to variable $age\_groups$ which is then used to produce the bar chart appearing in Figure \costas{add Figure} (the template shown in Figure \ref{figure:running-example:age-group-template} shows the template that created that chart)
+
+\input{interactivity-algorithm}

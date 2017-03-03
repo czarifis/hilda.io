@@ -3,10 +3,84 @@
 
 
 
-\input{running-example-template}
+% \input{running-example-template}
 
 
 
+\begin{figure*}
+\centering
+%
+%
+\begin{minipage}[c]{7.5cm}
+%
+\begin{minipage}[c]{7.5cm}
+\begin{code}
+\textbf{<\% let} age_groups = 
+   SELECT agegroup, count(*) AS total 
+   FROM (SELECT CASE
+    WHEN age BETWEEN 0 AND 9 THEN '0 to 9'
+    WHEN age BETWEEN 10 and 19 THEN '10 to 19'
+     ...
+    FROM (SELECT * FROM page_views pv join visitors v 
+          on pv.v_id = v.vid where time BETWEEN 
+          \textbf{<\%=min_time} and \textbf{<\%=max_time}) joined_data) jd
+   GROUP BY agegroup  
+   ORDER BY agegroup ASC \textbf{\%>}
+\end{code}
+\vspace*{-0.3cm}
+\subcaption{Data retrieval}
+\label{figure:running-example:age-group-data-retrieval}
+\vspace*{0.3cm}
+\end{minipage}
+
+\begin{minipage}[c]{7.5cm}
+\begin{code}
+age_groups = [
+   \{age_group: '0 to 9', total: 12\}, 
+   \{age_group: '10 to 19', total: 67\},
+   \{age_group: '20 to 29', total: 84\},  ...]
+\end{code}
+\vspace*{-0.3cm}
+\subcaption{Query Result}
+\label{figure:running-example:age-group-query-result}
+\vspace*{0.3cm}
+\end{minipage}
+%
+\end{minipage}
+\hspace{1cm}
+\begin{minipage}[c]{6cm}
+
+\begin{minipage}[c]{8.5cm}
+\begin{code}
+  \directive{unit}{highcharts}
+  \{
+    title: 'Visitor information',
+    xAxis : \{ 
+      labels : [
+        \directive{for}{v \textbf{in} age_groups} 
+          \directive{print}{v.age_group} 
+        \directive{end for}{}]
+    \}
+    series: [\{
+      data: [ \directive{for}{v \textbf{in} age_groups}
+          \{
+            y  : \directive{print}{v.total}
+          \}
+        \directive{end for}{} ]
+    \}]
+  \}
+  \directive{end unit}{}
+\end{code}
+\vspace*{-0.3cm}
+\subcaption{Template \texttt{temp\_view}}
+\vspace*{0.3cm}
+\label{figure:running-example:age-group-template}
+\end{minipage}
+\end{minipage}
+
+\caption{Template, template instance, and UAS configuration file for the running example}
+
+\end{figure*}
 
 
 
@@ -20,10 +94,10 @@ After the data analyst has completed this tasks, she ends up with visual compone
 \subsection{\projname\ Visual Units}
 \label{section:visual Units}
 
-\noindent To shield analysts from the laborious task of constructing visualizations, \projname\ abstracts out each visual component as a \projname\ \emph{visual unit} (or simply \emph{unit}). In the eyes of the analyst a visual unit is simply a black box that takes as input a JSON value containing the data that describes the visualization, namely, unit instance, and the visual unit is responsible for generating the respective visual component. As such a particular instantiation of the unit  can be described as $\gl{<\% unit } U \gl{ \%> } v \gl{ <\% end unit \%>}$, where $U$ the type of the visual unit and $v$ the JSON value corresponding to the input of the unit. 
+\noindent To shield analysts from the laborious task of constructing visualizations, \projname\ abstracts out each visual component as a \projname\ \emph{visual unit} (or simply \emph{unit}). In the eyes of the analyst a visual unit is simply a black box that takes as input a JSON value that describes the visualization, namely, unit instance. The visual unit internally uses the unit instance to invoke the appropriate renderer calls that will generate the expected visualization. As such a particular instantiation of the unit  can be described as $\gl{<\% unit } U \gl{ \%> } v \gl{ <\% end unit \%>}$, where $U$ the type of the visual unit and $v$ the JSON value corresponding to the input of the unit. 
 
 
-For instance, Figure \ref{figure:running-example:unit-body} shows a unit instance of type \texttt{highcharts}. The unit instance describes all the information that will be displayed in the visualization (such as the title of the chart, the labels on the x axis and so on). Each visual unit, comes with a unit instance schema that describes the format of unit instance.
+For instance, Figure \ref{figure:running-example:unit-body} shows a unit instance of type \texttt{highcharts}. The unit instance describes all the information that will be displayed in the visualization (such as the title of the chart, the labels on the x axis and so on). Each visual unit, comes with a unit instance schema that describes the format of the unit instance.
 
 
 %Based on this idea, \projname\ abstracts out the entire visual page in the form of a logical specification, referred to as a \emph{template instance}. The template instance contains a description of the visual units that should be displayed in the page together with their inputs. For instance, Figure \ref{???} shows the template instance of our running example. It consists of two unit instances, one of type HighCharts and one of type \ref{???}. Each unit instance is denoted as $\gl{<\% unit } U \gl{ \%> } v \gl{ <\% end unit \%>}$, where $U$ the type of the visual unit and $v$ the JSON value corresponding to the input of the unit. A special type of unit is an HTML unit for displaying HTML content. An HTML unit instance is of the form $\gl{<\% html \%> } e_1 \ldots e_n \gl{ <\% end html \%>}$, where $e_1, \ldots, e_n$ are HTML elements.
@@ -31,6 +105,8 @@ For instance, Figure \ref{figure:running-example:unit-body} shows a unit instanc
 \subsection{Template}
 \label{section:template}
 
+
+\eat{
 \begin{figure}[t]
 \centering
 \scriptsize
@@ -96,114 +172,20 @@ For instance, Figure \ref{figure:running-example:unit-body} shows a unit instanc
 \caption{BNF Grammar for Templates}
 \label{figure:bnf-template}
 \end{figure}
+}
 
-\emph{Templates} are declarative specifications used to generate \projname\ variables or construct unit instances. A template specifies this function through a set of \emph{template directives}, so that it provides syntax similar to well-known template languages, while it is essentially an expression of a functional programming language without recursion. A template also allows data collection from the visualizations; such collected data can be used in other parts of the template. 
+\costas{We should make it clear in the intro that \projname\ operates on a JSON datamodel. This means that source wrappers, visual units and templates all operate on the same model, no conversions are required from one to another. Additionally. since our datamodel is plain-old javascript objects, the analyst does not need to learn a new API in order to interact with our values.}
 
-There are four template directives: 1) the bind directive, which is encoded as \gl{<\%= E \%>}, a for-loop, encoded as \gl{<\% for v in E \%>}, \gl{<\% let E\%>}, and \gl{<\% bind \%>}. These are used to describe computation, define variables and set up data collection. We next describe each of them in detail.\\
-
-%Figure \ref{???} shows for instance the template for the heat map view of our running example. As we will explain in Section \ref{section:templates}, the template language is expressive enough to cater for the needs of most visual units and pages encountered in practice, supporting among others iteration through for loops and function calls. An application may contain more then one templates, which can be displayed as the result of actions, discussed next.\\
-
+\emph{Templates} are declarative specifications that can be used to generate \projname\ variables or unit instances. The template language supports a set of \emph{template directives}, all of which operate on the JSON datamodel. These directives are used to describe computation, define variables and set up data collection. Due to lack of space we do not include a figure containing a formal BNF grammar for the template language, instead we simply describe each of them in detail and provide a concrete example that illustrates their use. 
 
 
-\begin{figure*}
-\centering
-%
-%
-\begin{minipage}[c]{7.5cm}
-%
-\begin{minipage}[c]{7.5cm}
-\begin{code}
-\textbf{<\% let} age_groups = 
-   SELECT agegroup, count(*) AS total 
-   FROM (SELECT CASE
-    WHEN age BETWEEN 0 AND 9 THEN '0 to 9'
-    WHEN age BETWEEN 10 and 19 THEN '10 to 19'
-     ...
-    FROM (SELECT * FROM page_views pv join visitors v 
-          on pv.v_id = v.vid where time BETWEEN 
-          \textbf{<\%=min_time} and \textbf{<\%=max_time}) joined_data) jd
-   GROUP BY agegroup  
-   ORDER BY agegroup ASC \textbf{\%>}
-\end{code}
-\vspace*{-0.3cm}
-\subcaption{Data retrieval}
-\label{figure:running-example:data-retrieval}
-\vspace*{0.3cm}
-\end{minipage}
-
-\begin{minipage}[c]{7.5cm}
-\begin{code}
-age_groups = [
-   \{age_group: '0 to 9', total: 12\}, 
-   \{age_group: '10 to 19', total: 67\},
-   \{age_group: '20 to 29', total: 84\},  ...]
-\end{code}
-\vspace*{-0.3cm}
-\subcaption{Query Result}
-\label{figure:running-example:query-result}
-\vspace*{0.3cm}
-\end{minipage}
-%
-\end{minipage}
-\hspace{1cm}
-\begin{minipage}[c]{6cm}
-
-\begin{minipage}[c]{8.5cm}
-\begin{code}
-  \directive{unit}{highcharts}
-  \{
-    title: 'Visitor information',
-    xAxis : \{ 
-      labels : [
-        \directive{for}{v \textbf{in} age_groups} 
-          \directive{print}{v.age_group} 
-        \directive{end for}{}]
-    \}
-    series: [\{
-      data: [ \directive{for}{v \textbf{in} age_groups}
-          \{
-            y  : \directive{print}{v.total}
-          \}
-        \directive{end for}{} ]
-    \}]
-  \}
-  \directive{end unit}{}
-\end{code}
-\vspace*{-0.3cm}
-\subcaption{Template \texttt{temp\_view}}
-\vspace*{0.3cm}
-\label{figure:running-example:main-template}
-\end{minipage}
-\end{minipage}
-
-\caption{Template, template instance, and UAS configuration file for the running example}
-
-\end{figure*}
 
 
-\noindent {\bf Defining variables.} A template may define variables that are added to the UAS instance so that they can be used in subsequent computation. Variable definition is facilitated by the \gl{let} directive.
+\noindent {\bf Defining variables.} A template may define variables that are added to the notebook's environment so that they can be used in subsequent computation. The $\gl{<\% let } x \gl{ = } E \gl{ \%>}$ directive defines variable $x$ and assigns to it the result of the expression $E$. $E$ can denote three types of expressions: path navigation on JSON data, invocation of a python function that performs computation by using as input and output JSON values or a source-specific language (such as a SQL query). For instance, the template shown in Figure \ref{figure:first-running-example:data-retrieval} employs a \gl{let} directive to create a variable \texttt{readings} containing the visitor information that will be displayed in the chart (retrieved from a relational DBMS through an SQL query).
 
-The $\gl{<\% let } x \gl{ = } E \gl{ \%>}$ directive defines variable $x$ in the UAS, and assigns to
-$x$ the result of evaluating the expression $E$. The expression $E$ can be a JavaScript expression, a source-specific language (such as a SQL query in the case of relational database sources) or a JSON++ path. For example, the template of our running example (\templateline{let}) employs a \gl{let} directive to create a variable \texttt{readings} containing all temperature readings (retrieved from a relational DBMS through a SQL query).\\
+\noindent {\bf Reporting syntax.} Value assignments and iterations over collections are specified by using the \gl{print} and \gl{for} directives. The $\gl{<\% print } E \gl{ \%>}$ directive evaluates the expression $E$ and returns the result, while the $\gl{<\% for } x \gl{ in } E \gl{ \%> } B \gl{ <\% end for \%>}$ directive specifies that variable $x$ iterates over the result of $E$ and, in each iteration, it instanciates the body $B$ of the \gl{for} loop. In Figure \ref{figure:first-running-example:main-template}, in lines 7-9 and 14-18 a \gl{for} directive is used to iterate over the readings retrieved from the database and for each reading, it generates a new JSON value, with the use of the \gl{print} directive. Particularly, in line 8 the template generates a string (the time label), which is added to the labels array (which contains the labels that will appear on the x axis of the chart). In lines 15-17 it generates a JSON object of the form \{y: ...\} and adds it to the data array. The data array in highcharts contains the points that will appear in the chart.
 
-{\bf Reporting syntax and semantics.} Computation in a template is specified using the \gl{print} and \gl{for} directives.
-The $\gl{<\% for } x \gl{ in } E \gl{ \%> } B \gl{ <\% end for \%>}$ directive specifies that variable $x$ iterates over the result of the expression $E$. In each iteration, the body $B$ of the \gl{for} loop is instantiated. For example, the template of our running example (\templateline{for}) uses a \gl{for} directive to iterate over the sensor readings (stored in the \texttt{readings} variable). For each reading, it generates a new JSON tuple of the form \texttt{\{y:\ldots, color:\ldots\}}, which is the data format expected by the HighCharts unit for each data point. \eat{The values of the \texttt{y} and \texttt{color} attributes are specified through print directives, as explained below.}
-
-% Eaten as per Yannis\' comment
-
-The $\gl{<\% print } E \gl{ \%>}$ directive instantiates the result of expression $E$. For example, the template of the running example uses two \gl{print} directives to generate the values of the \texttt{y} and \texttt{color} attributes of each JSON tuple produced by the \gl{for} directive. \yannis{The part between the ``\{\}" could be removed}\{The value of \texttt{y} is created by printing the value of the \texttt{reading} variable (\templateline{print-y}), while the value of \texttt{color} is generated by calling the \texttt{toCSS} function, which takes as input the current reading and the normal temperature (set through the slider) and produces a CSS color code according to the coloring schema explained above (\templateline{print-color}).\}\\
-
-%(Figure~\ref{figure:running-example:main-template}) generates the CSS color of a \texttt{<td>} element (i.e., of a table cell) by instantiating through a print directive the result of the \texttt{toCss()} function (which translates a value to a CSS color code according to the setting of the threshold).
-
-%The $\gl{<\% refresh } y \gl{ = } E \gl{ \%>}$ directive defines \textit{derived variable} (i.e., a variable that is computed using one or more other variables) $y$ in the UAS, and sets $y$ to the result of expression $E$. The expression $E$ can be a JavaScript expression, a SQL query or a JSON++ path. For example, \yannisk{TBD}
-%the heat map template (Figure~\ref{figure:running-example:main-template}) specifies a derived variable \texttt{matrix} for product stock data instantiated to the result of a SQL query.
-%\yannisk{Why does the framework differentiate between base and derived variables?}\\ 
-
-%An important distinction between base variables and derived variables is as follows. A view $Y$ is declaratively specified to be refreshed with the evaluation result of $E_Y$, thus enabling the \projname\ framework to utilize IVM optimizations for incrementally evaluating $E_Y$. In contrast, a base variable $X$ is imperatively updated using either \texttt{INSERT} / \texttt{UPDATE} / \texttt{DELETE} commands on the UAS, or user input through the bind directive (explained below), and therefore the \projname\ framework does not optimize these updates.\\
-
-{\bf Collecting data.} In addition to specifying how to compute a template instance, the template's \gl{bind} directive allows the developer to specify how data are collected from user input on the page.
-
-The $\gl{<\% bind } x = E \gl{ \%>}$ directive specifies that the template instance attribute value in whose position the directive appears will be assigned to variable $x$. This allows UAS variables to become bound to input received by visual units.  \yannis{If UAS has not been defined we need to say what is the JavaScript target.} \costas{We should define a Model/VDB variable, that encompasses every client-side variable used in an application. The target in this case would be the Model.x variable} For instance, the template of our running example (\templateline{bind}) uses a \gl{bind} directive to assign to variable \texttt{threshold} the current value of the slider (which is returned by the slider unit as the value of the \texttt{value} variable). The \gl{bind} directive also allows the developer to specify an expression $E$, whose value will be assigned to the variable when the template is first instantiated. For example, the slider of our running example is initialized with the value 65.\\
+\noindent {\bf Collecting data.} In addition to specifying how to compute a template instance, the template's \gl{bind} directive allows the analyst to specify user input collection. Specifically, the $\gl{<\% bind x} \gl{ \%>}$ directive describes a two-way bind that will be created between the part of the unit instance appearing on its left side and to variable $x$. For instance, in Figure \ref{figure:first-running-example:main-template} in lines 10-11 we create a two-way binding between the min and max boundaries of the chart and the min and max values of the time labels that have been retrieved (namely min\_time and max\_time). While the user interacts with chart he can select a particular region in the chart which in turn updates the values $min\_time$ and $max\_time$. This event invokes an internal propagation algorithm (which will be described in the next section) which triggers the revaluation of the \projname\ statements that use the values $min\_time$ and $max\_time$ in other parts of the notebook.
 
 %In contrast to the \gl{<\% print \%>} directive, which is a one-way binding from the UAS to the visual instance, the \gl{<\% bind \%>} directive specifies a two-way binding between the UAS and the visual instance, thus allowing values to be collected from the visual interface. For instance, \yannisk{TBD}\\
 %the heat map template (Figure~\ref{figure:running-example:main-template}) specifies that the value of the slider will be bound (i.e., assigned) to the \texttt{threshold} variable.\\
