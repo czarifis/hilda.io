@@ -20,7 +20,9 @@
      password : 'myP@ss'
    \}] 
 \end{code}
+\vspace*{-0.4cm}
 \subcaption{DB Access Configuration file}
+\vspace*{0.3cm}
 \label{figure:source-config-file}
 \end{minipage}
 %
@@ -34,7 +36,7 @@
    GROUP BY time 
    ORDER BY time ASC \textbf{\%>}
 \end{code}
-\vspace*{-0.3cm}
+\vspace*{-0.4cm}
 \subcaption{Data retrieval}
 \label{figure:first-running-example:data-retrieval}
 \vspace*{0.3cm}
@@ -47,16 +49,17 @@ readings = [
    \{visits: 10, time: '09:00'\},
    \{visits: 25, time: '10:00'\},  ...]
 \end{code}
-\vspace*{-0.3cm}
+\vspace*{-0.4cm}
 \subcaption{Query Result}
 \label{figure:running-example:query-result}
 \vspace*{0.3cm}
 \end{minipage}
 %
+\vspace*{0.6cm}
 \end{minipage}
-\hspace{1cm}
+\hspace{2cm}
 \begin{minipage}[c]{6cm}
-\begin{minipage}[c]{8.5cm}
+\begin{minipage}[c]{7.5cm}
 \begin{code}
   \directive{unit}{highcharts} \{
     title: 'Visitor information' ,
@@ -68,15 +71,14 @@ readings = [
     series: [\{ data: [ \{y:15\}, \{y:10\}...] \}]
   \} \directive{end unit}{}
 \end{code}
-\vspace*{-0.3cm}
+\vspace*{-0.4cm}
 \subcaption{Unit with evaluated unit state}
 \vspace*{0.3cm}
 \label{figure:running-example:unit-body}
 \end{minipage}
-\begin{minipage}[c]{8.5cm}
+\begin{minipage}[c]{7.5cm}
 \begin{code}
-  \directive{unit}{highcharts}
-  \{
+  \directive{unit}{highcharts} \{
     title: 'Visitor information',
     type: 'line'
     xAxis : \{ 
@@ -94,18 +96,17 @@ readings = [
           \}
         \directive{end for}{} ]
     \}]
-  \}
-  \directive{end unit}{}
+  \} \directive{end unit}{}
 \end{code}
 \vspace*{-0.3cm}
 \subcaption{Template \texttt{temp\_view}}
-\vspace*{0.3cm}
+\vspace*{0cm}
 \label{figure:first-running-example:main-template}
 \end{minipage}
 \end{minipage}
-
+\vspace*{-0.3cm}
 \caption{Template, template instance, and UAS configuration file for the running example}
-
+\vspace*{-0.3cm}
 \end{figure*}
 
 
