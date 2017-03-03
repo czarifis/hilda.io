@@ -20,9 +20,47 @@ We address these issues, by extending interactive notebooks with the  {\projname
 %	\item We allow in-line declarative code directly in JSON...
 \end{itemize}
 
-Throughout this paper, we present {\projname} via an example data analysis: We assume a scenario where a data analyst must (a) retrieve (and curate) website access information from a database, (b) plot a histogram of access count Vs timestamp, as well as a histogram of access count Vs age groups, and (c) be able to select a time range from the first histogram using mouse input and automatically filter and display data in the second plot to present age-group-based activity within that time frame. 
+Throughout this paper, we present {\projname} via an example data analysis: We assume a scenario where a data analyst must (a) retrieve  website access information from a database, (b) plot a line chart of access count Vs timestamp, as well as a bar chart of access count Vs age groups, and (c) be able to select a time range from the line chart using mouse input and automatically filter and display data in the second plot to present age-group-based activity within the selected time frame. 
+
+For our walkthrough example, we assume a Jupyter server where the analysts develop their notebooks and a different database server where data is stored. Table \ref{tab:schema} shows how our databases are organized. The analyst's first task is to retrieve the data via database queries, join the two tables based on the visitor id (``vid'') key and group by (1) ``time'' and (2) ``age'' to prepare the data for the two plots.
+
+During the visualization stage, the analyst implements two ``linked'' plots in such a way that a range selection in the first plot \textit{automatically} (without re-executing code in the notebook) filters the data presented in the second plot. Figure \ref{fig:vision} illustrates the expected chart behavior. A time-frame selection in the first chart (10:00AM - 1:00PM) causes the second chart to only plot those accesses that occurred during the selected interval. 
+
+It is important to note that this interactive chart implementation using imperative languages is not a trivial task and possibly beyond the coding skill set of an average data analyst. Such a task requires advanced coding skills and implementation of event listeners to capture the user's mouse input and asynchronously trigger execution of other functions that will update data and re-draw the second figure. As we show later in Section ??, the {\projname} framework is equipped with modules that can take care of the heavy work, while the analyst only needs to define ``bound'' (linked) variables.
+
+\begin{table}
+\begin{center}
+
+\begin{tabular}{|c|c|c|c|}
+\hline 
+\multicolumn{4}{|c|}{Table name: ``page\_views''} \\ 
+\hline 
+page\_view\_id & v\_id & url & time \\ 
+\hline 
+\end{tabular} 
+
+\hfill
+
+\begin{tabular}{|c|c|c|c|c|}
+\hline 
+\multicolumn{5}{|c|}{Table name: ``visitors''} \\ 
+\hline 
+vid & name & lastname & username & age \\ 
+\hline 
+\end{tabular} 
+
+\end{center}
+\caption{Schema description of the two tables in our database.}
+\label{tab:schema}
+\end{table}
 
 The remainder of this paper is organized as follows: Section ?? discusses the architecture of the {\projname} framework. Due to space limitation, we focus on those aspects that can be useful as a notebook extension. Section ?? presents our example data analysis. Finally, Section ?? concludes the paper.
+
+\begin{figure*}
+	\includegraphics[width=\textwidth]{figures/highchart_final.pdf}
+	\caption{Demonstration of interactive charts. The analyst's selection automatically updates the second plot (right).}
+	\label{fig:vision}
+\end{figure*}
 
 \remark{Ok I thought about it and I propose the following modifications in the paper structure (Nothing major - just moving text around to make it more readable): We begin with a good discussion about the vidette features that can help notebooks in section 2. We then show the entire walkthrough in one section (Section 3). By now, the reader knows what vidette can do so it will be easier to follow and understand the code we show.}
 
