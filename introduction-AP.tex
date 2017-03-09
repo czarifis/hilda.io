@@ -4,9 +4,9 @@
 
 
 
-The database, HCI and systems communities have proposed an excess of tools that manage to simplify common tasks that typically take place in an analytical process. Such tools, however, either tend to focus on only individual stages (such as data retrieval or visualization) of a much bigger analytical pipeline or while they do provide a bigger set of possible operations, they only focus on particular use cases (for instance pattern matching, finding correlations and so on). Despite the remarkable contributions, data scientists often have to combine such tools in order to complete an analysis. This lack of flexibility often pushes code-literate data scientists to the tested and proven path of interactive notebooks such as Jupyter.
+The database, HCI and systems communities have proposed an excess of tools that manage to simplify common tasks that typically take place in an analytical process. Such tools, however, either tend to focus on only individual stages (such as data retrieval or visualization) of a much bigger analytical pipeline or while they do provide a bigger set of possible operations, they only focus on particular use cases (for instance pattern matching, finding correlations and so on)\costas{todo: add references}. Despite the remarkable contributions, data scientists often have to combine such tools in order to complete an analysis. This lack of flexibility often pushes code-literate data scientists to the tested and proven path of interactive notebooks such as Jupyter.
 
-Interactive notebooks allow the use of popular, high-level and highly expressive imperative languages, such as Python, for retrieving, processing and visualizing data, all in one platform. Due to the high popularity of languages they support, there is also a massive collection of utility libraries that can be used to facilitate any potential data science project. Furthermore, the web environment of notebooks enables collaboration between data scientists, since it allows them to develop and run code, process data and generate visualizations. Lastly, after completing an analysis, data scientists can compose their findings into an interactive (and re-runnable) report-like page, that contains code, visualizations and textual description of the analysis, which can also be shared with non-technical users.
+Interactive notebooks allow the use of popular, high-level and highly expressive imperative languages, such as Python, for retrieving, processing and visualizing data, all in one platform. Due to the high popularity of languages they support, there is also a massive collection of utility libraries that can be used to facilitate any potential data science project. Furthermore, the web environment of notebooks enables collaboration between data scientists, since it allows them to develop and run code that processes data and generates visualizations directly on the browser. Lastly, after completing an analysis, data scientists can compose their findings into an interactive report-like page, that contains re-runnable code, visualizations and textual description of the analysis, which can also be shared with non-technical users. \costas{maybe add a small figure of the jupyter UI?}For all those reasons notebooks are extensively used in data science projects.
 
 \eat{
 Additionally, the notebook-like interface, they offer, enables the creation of interactive documents that contain code, textual description and visualizations, which helps readers follow the analysis and perhaps re-run certain blocks of that notebook.
@@ -15,112 +15,24 @@ Additionally, the notebook-like interface, they offer, enables the creation of i
 
 . Due to the wide popularity of such languages, there is also a huge collection of third-party libraries that can be used by data scientists as building blocks of a much bigger analytical process. Furthermore, the web environment of notebooks enables collaboration between data scientists, since it allows them to directly interact with the user interface in order to develop and run code, process data, generate visualizations, and lastly, compose their findings into an interactive (and re-runnable) report-like page, that contains code, visualizations and textual description of the analysis.
 }
-However as we show in this work, interactive notebooks are still suboptimal with regard to ease of use and interactivity. Retrieving, processing and visualizing data requires technical knowledge that often exceeds the skill-set of a typical data scientist. Specifically, such steps require data transfers and package installations on the notebook server, so that they can be used in the analysis. This requires knowledge that fits the job description of a system administrator rather than a data analyst. Additionally, even after the environment has been setup, the data analyst has to read long documentation files that explain how to programmatically interact with such tools and often spend significant effort writing plumping code in order combine their functionality.
+However as we show in this work, interactive notebooks are still suboptimal with regard to ease of use for data analysts. Retrieving, processing and visualizing data requires technical expertise that often exceeds the skill-set of a typical data scientist. Specifically, such steps require data transfers and package installations on the notebook server, so that they can be used in an analysis. Such tasks fit the job description of a system administrator rather than a data analyst. Additionally, even after the environment has been setup, the data analyst has to read long documentation files that explain how to programmatically interact with such tools and she often has to spend significant effort writing plumbing code in order combine their functionality.
 
-
-In order to illustrate the challenges, we will use the following example of a potential analysis:
-
-\begin{example}
-Consider a data analyst, working for a news portal website, who would like to create a Jupyter notebook that extracts and presents information about the demographics of the website's reader-base during particular hours. More specifically, the analyst would like to construct a chart showing the number of readers that visit the website during the day; then based on this information, she would like to extract the age groups that visit the website the most, during specific hours and present this to the portal editor. By doing this, the analyst can convince the portal editor to publish more articles and advertisements that target particular age groups during hours in which they visit the portal the most, thus maximizing the portal's revenue and user satisfaction.
-\end{example}
-
-
-For this analysis, we assume that the news portal maintains information about its reader-base in a database system. Table \ref{tab:schema} shows a potential database schema, that could be used for this analysis. The database contains two tables, namely ``Page Views" and ``Visitors"; table ``Visitors" contains information about each reader, such as the reader id, name, lastname, and her age, while the table ``Page Views" maintains a tuple for each visit, that consists of a visit id, a reference to the user, and the time in which the user visited the website. The reader information could have been retrieved, with the her permission, from various social media services (such as Facebook, Google etc). In order to create this analysis, the data analyst must (a) retrieve  website access information from the database, by joining the two tables on the visitor id (b) generate a plot that shows the number of users that visit the website during the day, (c) issue a query that counts the number of visitors per age group, for each potential set of selected hours, and (d) create a bar chart that shows the number of visitors per age group. 
-
-
-\subsection{Challenges with Traditional Interactive Notebooks}
+Other than the aforementioned limitations that mainly impact data analysts, notebooks also have limitations that impact the, potentially non-technical, readers of the generated notebooks. Particularly, while notebooks can contain visualizations that illustrate important aspects of a data analysis, the readers cannot interact with the provided visualizations in the same way they would if these visualizations were part of a dashboard application. Specifically, even if the analyst that composed the notebook used third-party web-based visualization libraries that allow some user interaction, this interaction is limited to individual changes occurring only to the visualization with which the reader  interacts and cannot trigger changes to other parts of the notebook. For this reason, only code-literate readers, capable of extending the notebook with more coding snippets, are able to further explore the underlying data, while the rest are limited to passively reading the generated notebook.\\
 
 
 
-In order to illustrate the challenges, we will describe the steps required for performing this analysis in a traditional interactive notebook.
 
-\noindent {\bf Issues related to third-party utility libraries - Security concerns.} Before even starting the afore-mentioned tasks the data analyst must make sure that all  third-party python packages that will be used for retrieving and visualizing the data, are installed. This step will either introduce a dependency between the analyst and some system administrator, or the analyst will need the appropriate access rights in order to perform the installation, typically, using a command line. The later can be a security concern or can lead to corrupted systems if not performed correctly. The complexity of this step increases as the number of utility libraries, our analyst wants to access, increases. \eat{More specifically, for cases when an analyst needs to access data stored in a MongoDB and a MySQL database, two drivers will need to be installed.}
-
-Once the system is configured, the analyst needs to read lengthy documentation pages in order to properly issue queries to the databases, via imperative code, using the API of the respective library. During this step, the analyst has to also specify the credentials that will be used for accessing the database system. In most such libraries, the credentials have to be inlined into the method that establishes the connection with the database system. While this would not be a security concern in a python application (since the code that includes the credentials would have been compiled into a binary file, thus hiding the credentials), in a Jupyter notebook, the credentials would lie in plain sight for anyone, who has access to the notebook, to see.
-
-\noindent {\bf Data model conversions.}
-After, establishing the connection with the database system, and issuing the queries, the analyst, can consume the results by using the internal, to the library, datamodel. After doing so, the analyst will have to again read documentation pages in order to infer the data model dictated by the visualization library she selected, then convert the format of the data into the one that is expected by the respective library and lastly construct the first visualization, by invoking the appropriate renderer function. Note that data model conversions have to take place every time the analyst wishes to integrate a third-party library in her analysis, so the amount of ``plumping code" required, can quickly skyrocket.
-
-
-\noindent {\bf Limited interactivity.}
-The next step, is for the analyst to issue a query that counts the visitors per age group for a set of selected hours and construct a bar chart showing the result. Note, however, that there's no straightforward way for selecting a valid range of hours. The analyst will have to go through a process of trial and error, by issuing an arbitrary number of such queries and plotting the results, until she finds a set that produces valuable insight. Furthermore, even if the analyst goes through this process for the data corresponding to a particular day, the hour range selection she made, might not produce any valuable insight for the dataset corresponding to another day's visitors. The use of reactive charts could have been proven useful in this scenario. If the analyst was able to use a chart that allows the reader to select a particular range of hours by using the first plot, she could use the reader's input in order to retrieve and plot only the user demographics for this particular range. This would add useful exploratory capabilities, to the notebook.
-
-It is important to note that this feature is not trivial to implement in interactive notebooks. Such a feature requires advanced coding skills and implementation of event listeners to capture the user's mouse input and asynchronously trigger execution of other functions that will update data and reevaluate expressions that depend on that data. 
-
-\subsection{Simplifying and Enhancing Interactive Notebooks}
-
-In this section we will describe how the \projname\ notebook engine deals with the aforementioned challenges. Firstly, \projname\ notebooks support two types of modules, \textbf{source wrappers} and \textbf{visual units}. Source wrappers allow the use of source specific languages for querying database systems (i.e SQL is used to query MySQL and PostgreSQL databases). When using source wrappers, data analysts directly provide a query on the notebook interface and receive the result in JSON format. Visual units are constructs that input JSON and generate visualizations. Both source wrappers and visual units come pre-installed and can be used by data analysts without the installation of any additional packages. Additionally, since no method calls are required for accessing and visualizing data, the analyst does not have to read long documentation files before using them. 
-
-In order for source wrappers to connect to the respective database systems, the data analyst must provide a configuration file, describing the information required for establishing a connection with each source. Such configuration files are added by interacting directly with the notebook interface, therefore data analysts do not have to use a terminal during setup. Once added, these files are hidden from the UI and encrypted thus diminishing any security concerns. Lastly, visual units are constructs that take as input JSON objects (in a predefined format) and generate visualizations on the notebook interface. 
-
-
-Source wrappers and visual units, both use the same data model JSON, so no data model transformations are required for retrieving and visualizing data. This minimizes the amount of plumping code required for generating an analysis. For cases when the data analyst wishes to perform some additional computation or perform data transformations, \projname\ also supports a declarative template language that operates on JSON data. When using the \projname's template language, data analysts can also describe reactive behavior. Specifically, by binding individual variables to certain parts of the visual unit, data analysts can collect information which can later be used in other parts of the notebook. By doing so, analysts can describe computation that depends on the reader's input. \projname's propagation algorithm, identifies statements that depend on such libraries and triggers their evaluation. This process leads to truly interactive notebooks, that react to the reader's input, thus enhancing the exploratory capabilities of traditional notebooks.
+\noindent {\bf Contributions.}
+In order to resolve these issues, we extend interactive notebooks with the  {\projname} notebook engine. The main contributions of this extension are: (a) visual and data retrieval constructs, that simplify the process of data retrieval and visualization, for data analysts, (b) A declarative template language that can be used for describing computation, data transformations and user input collection, (c) A propagation algorithm, that utilizes visual and data retrieval constructs, in association with a template language in order to introduce a reactive behavior in notebooks, thus enabling non-technical readers to further explore data, without requiring any coding skills. 
 
 \eat{
-Source wrappers require the instantiation of a configuration file, that describes the information required for establishing a connection with each source. Such configuration files are added by data analysts by interacting directly with the notebook interface. Once added, these files are hidden from the UI and encrypted thus diminishing any security concerns. Lastly, visual units are constructs that take as input JSON objects (in a predefined format) and generate visualizations on the notebook interface. 
-
-
-Most importantly, source wrappers and visual units, both use the same data model JSON, so no data model transformations are required for retrieving and visualizing data. For cases when the data analyst wishes to perform some data transformations, \projname\ also supports a declarative template language.
-
-
-Once a source wrapper receives a query, it propagates it to the respective database system, and then parses and returns the result in JSON format. Source wrappers require the instantiation of a configuration file, that describes the information required for establishing a connection with each source. Such configuration files are added by data analysts by interacting directly with the notebook interface. Once added, these files are hidden from the UI and encrypted thus diminishing any security concerns. Lastly, visual units are constructs that take as input JSON objects (in a predefined format) and generate visualizations on the notebook interface. 
-
-Both source wrappers and visual units come pre-installed and can be used directly on the notebook without the installation of any additional packages. Additionally, since no method calls are required for accessing and visualizing data, the analyst does not have to read long documentation files before using them. Most importantly, source wrappers and visual units, both use the same data model JSON, so no data model transformations are required for retrieving and visualizing data. For cases when the data analyst wishes to perform some data transformations, \projname\ also supports a declarative template language.
+The remainder of this paper is organized as follows: Section ?? discusses the architecture of the {\projname} framework. Due to space limitation, we focus on those aspects that can be useful as a notebook extension. Section ?? presents our example data analysis. Finally, Section ?? concludes the paper.
 }
 
 \eat{
-interactive chart implementation using imperative languages is not a trivial task and possibly beyond the coding skill set of an average data analyst. Such a task requires advanced coding skills and implementation of event listeners to capture the user's mouse input and asynchronously trigger execution of other functions that will update data and re-draw the second figure. As we show later in Section ??, the {\projname} framework is equipped with modules that can take care of the heavy work, while the analyst only needs to define ``bound'' (linked) variables.
-
-
-Finally, 
-
-
-plot a line chart of access count Vs timestamp, as well as a bar chart of access count Vs age groups, and (c) be able to select a time range from the line chart using mouse input and automatically filter and display data in the second plot to present age-group-based activity within the selected time frame. 
-
-
-The data analyst can access historic data about the user base by directly querying the data base system. Table \ref{tab:schema} shows the database schema. The analyst's first task is to retrieve the data via database queries, join the two tables based on the visitor id (``vid'') key and group by (1) ``time'' and (2) ``age'' to prepare the data for the two plots.
-
-Installing packages, transferring data and connecting with database systems requires technical knowledge that often exceeds the skill-set of a typical data scientist. Lastly, while such notebooks support the generation of visualizations with the use of the appropriate library
-
-
-
-Throughout this paper, we present {\projname} via an example data analysis: We assume a scenario where a data analyst must (a) retrieve  website access information from a database, (b) plot a line chart of access count Vs timestamp, as well as a bar chart of access count Vs age groups, and (c) be able to select a time range from the line chart using mouse input and automatically filter and display data in the second plot to present age-group-based activity within the selected time frame. 
-
-For our walkthrough example, we assume a Jupyter server where the analysts develop their notebooks and a different database server where data is stored. Table \ref{tab:schema} shows how our databases are organized. The analyst's first task is to retrieve the data via database queries, join the two tables based on the visitor id (``vid'') key and group by (1) ``time'' and (2) ``age'' to prepare the data for the two plots.
-
-During the visualization stage, the analyst implements two ``linked'' plots in such a way that a range selection in the first plot \textit{automatically} (without re-executing code in the notebook) filters the data presented in the second plot. Figure \ref{fig:vision} illustrates the expected chart behavior. A time-frame selection in the first chart (10:00AM - 1:00PM) causes the second chart to only plot those accesses that occurred during the selected interval. 
-
-It is important to note that this interactive chart implementation using imperative languages is not a trivial task and possibly beyond the coding skill set of an average data analyst. Such a task requires advanced coding skills and implementation of event listeners to capture the user's mouse input and asynchronously trigger execution of other functions that will update data and re-draw the second figure. As we show later in Section ??, the {\projname} framework is equipped with modules that can take care of the heavy work, while the analyst only needs to define ``bound'' (linked) variables.
+\noindent {\bf Contributions.}
+To sum up, we extend interactive notebooks with the  {\projname} notebook engine. The main contributions of this extension are: (a) visual and data retrieval constructs, that simplify the process of data retrieval and visualization, (b) A declarative template language that can be used for specifying computation, data transformations and user input collection, (c) A propagation algorithm, that utilizes visual and data retrieval constructs, in association with a template language in order to introduce a reactive in notebooks. 
 }
-\begin{table}
-\begin{center}
-
-\begin{tabular}{|c|c|c|c|}
-\hline 
-\multicolumn{4}{|c|}{Page Views} \\ 
-\hline 
-id & vid & url & time \\ 
-\hline 
-\end{tabular} 
-
-\hfill
-
-\begin{tabular}{|c|c|c|c|c|}
-\hline 
-\multicolumn{5}{|c|}{Visitors} \\ 
-\hline 
-vid & name & lastname & username & age \\ 
-\hline 
-\end{tabular} 
-
-\end{center}
-\caption{Schema description of the two tables in our database.}
-\label{tab:schema}
-\end{table}
-
-
-To sum up, we extend interactive notebooks with the  {\projname} framework. The main contributions of this extension are: (a) visual and data retrieval constructs, that simplify the process of data retrieval and visualization, (b) A declarative template language that can be used for specifying computation and data transformations, (c) A propagation algorithm, that utilizes visual and data retrieval constructs, in association with a template language in order to offer reactive notebooks. 
-
 \eat{
 
 \begin{itemize}
@@ -136,14 +48,14 @@ To sum up, we extend interactive notebooks with the  {\projname} framework. The 
 
 }
 
-The remainder of this paper is organized as follows: Section ?? discusses the architecture of the {\projname} framework. Due to space limitation, we focus on those aspects that can be useful as a notebook extension. Section ?? presents our example data analysis. Finally, Section ?? concludes the paper.
 
+\eat{
 \begin{figure*}
 	\includegraphics[width=\textwidth]{figures/highchart_final_a.pdf}
 	\caption{Demonstration of interactive charts. The analyst's selection automatically updates the second plot (right).}
 	\label{fig:vision}
 \end{figure*}
-
+}
 \eat{
 \begin{figure*}
 	\includegraphics[width=\textwidth]{figures/highchart_final_b.pdf}
