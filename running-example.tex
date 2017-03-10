@@ -1,13 +1,8 @@
 
 \section{Running Example}
 
-In order to illustrate the issues with existing notebooks and describe the extensions in \projname\, we will use the following example of a potential analysis:
 
-\begin{example}
-Consider a data analyst, working for a news portal website. The analyst wishes to create a notebook that extracts and presents information about the demographics of the website's reader-base during particular hours. More specifically, the analyst wants to construct a chart showing the number of readers that visit the website during the day; then based on this information, she would like to extract the age groups of the visitors, during various hours of that day and present the results to the portal editor. Figure \ref{figure:first-running-example:first-line-chart} shows the graph that displays the number of visitors per hour in a line chart and Figure \ref{figure:first-running-example:first-bar-chart} displays the age groups of the visitors in a bar chart. By doing this, the analyst can convince the portal editor to publish more articles and advertisements that target particular age groups during hours in which they visit the portal the most, thus maximizing the portal's revenue and reader's satisfaction.
-\end{example}
-
-\begin{figure}[ht]
+\begin{figure}[t]
   \centering
   \includegraphics[width=0.8\columnwidth]{figures/first-line.png}
   \caption{Line chart showing visitors per hour}
@@ -18,19 +13,6 @@ Consider a data analyst, working for a news portal website. The analyst wishes t
   \caption{Bar chart showing age groups of visitors}
   \label{figure:first-running-example:first-bar-chart}
 \end{figure}
-
-
-
-For this analysis, we assume that the news portal maintains information about its reader-base in a Postgres database system. Table \ref{tab:schema} shows a potential database schema, that could be used for storing visitor information. The database contains two tables, namely ``Page Views" and ``Visitors"; table ``Visitors" contains information about each reader, such as the reader id, name, lastname, username and age. The table ``Page Views" maintains a tuple for each visit, and it consists of a visit id, the visitor id (foreign key referencing the visitor), the url of the visited page and the hour and date in which the user visited the website. The reader information could have been retrieved, with their permission, from various social media services (such as Facebook, Google etc). In order to construct this notebook, the data analyst must (a) retrieve  website access information from the database, by joining the two tables on the visitor id (b) generate a plot that shows the number of users that visit the website during the day, (c) issue a query that counts the number of visitors per age group, for each potential set of selected hours, and (d) create a bar chart that shows the number of visitors per age group. 
-
-
-\section{Traditional Notebooks}
-
-
-
-We will now describe how a data scientist would perform this analysis with a traditional interactive notebook that uses Python. While we do so, we will describe the issues that arise.
-
-\noindent {\bf Setting up and interacting  with third-party utility libraries - Security concerns.} Before even starting working on any of the afore-mentioned tasks the data analyst must make sure that all third-party python packages that will be used for retrieving and visualizing data, are installed. This step will either introduce a dependency between the analyst and some system administrator, or the analyst will need the appropriate access rights in order to perform the installation, typically, using a command line. The latter can be a security concern (especially, if the server on which the notebook operates, also hosts other applications) and can also lead to corrupted systems if not performed correctly. The complexity of this step increases as the number of utility libraries, our analyst wants to use, increases. \eat{More specifically, for cases when an analyst needs to access data stored in a MongoDB and a MySQL database, two drivers will need to be installed.}
 
 \begin{table}
 \begin{center}
@@ -59,150 +41,188 @@ vid & name & lastname & username & age \\
 \end{table}
 
 
-Once the system is configured, the analyst needs to read lengthy documentation pages in order to properly issue queries to the employed database system, using the API of the respective library. This step typically requires the use of imperative code that interacts with the library. During this step, the analyst has to also specify the credentials that will be used for accessing the database system. In most such libraries, the credentials have to be inlined into the method call that establishes the connection with that system. While this would not be a security concern in a python application (since the code that includes the credentials would have been compiled into a binary file, thus hiding the credentials), in a python notebook, the credentials would lie in plain sight for anyone, who has access to the notebook, to see.
+In order to illustrate the issues with existing notebooks and describe the extensions in \projname\, we will use the following example of a potential analysis:
+
+\begin{example}
+Consider a data analyst, working for a news portal website. The analyst wishes to create a notebook that extracts and presents information about the demographics of the website's reader-base during particular hours. More specifically, the analyst wants to construct a chart showing the number of readers that visit the website during the day; then based on this information, she would like to extract the age groups of the visitors, during various hours of that day and present the results to the portal editor. Figure \ref{figure:first-running-example:first-line-chart} shows the graph that displays the number of visitors per hour in a line chart and Figure \ref{figure:first-running-example:first-bar-chart} displays the age groups of the visitors in a bar chart. By doing this, the analyst can convince the portal editor to publish more articles and advertisements that target particular age groups during hours in which they visit the portal the most, thus maximizing the portal's revenue and reader's satisfaction.
+\end{example}
+
+\eat{
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=0.8\columnwidth]{figures/first-line.png}
+  \caption{Line chart showing visitors per hour}
+\label{figure:first-running-example:first-line-chart}
+  %\vspace*{\floatsep}% http://tex.stackexchange.com/q/26521/5764
+   \vspace*{0.1cm}
+  \includegraphics[width=0.8\columnwidth]{figures/first-bar.png}
+  \caption{Bar chart showing age groups of visitors}
+  \label{figure:first-running-example:first-bar-chart}
+\end{figure}
+}
+
+
+For this analysis, we assume that the news portal maintains information about its reader-base in a Postgres database system. Table \ref{tab:schema} shows a potential database schema, that could be used for storing visitor information. The database contains two tables, namely ``Page Views" and ``Visitors"; table ``Visitors" contains information about each reader, such as the reader id, name, lastname, username and age. The table ``Page Views" maintains a tuple for each visit, and it consists of a visit id, the visitor id (foreign key referencing the visitor), the url of the visited page and the hour and date in which the user visited the website. The reader information could have been retrieved, with their permission, from various social media services (such as Facebook, Google etc). In order to construct this notebook, the data analyst must (a) retrieve  website access information from the database, by joining the two tables on the visitor id (b) generate a plot that shows the number of users that visit the website during the day, (c) issue a query that counts the number of visitors per age group, for each potential set of selected hours, and (d) create a bar chart that shows the number of visitors per age group. 
+
+
+\section{Traditional Notebooks}
+
+
+
+We will now describe how a data scientist would perform this analysis with a traditional interactive notebook that uses Python. While we do so, we will describe the issues that arise.
+
+\noindent {\bf Setting up and interacting  with third-party utility libraries - Security concerns.} Before even starting working on any of the afore-mentioned tasks the data analyst must make sure that all third-party python packages that will be used for retrieving and visualizing data, are installed. This step will either introduce a dependency between the analyst and some system administrator, or the analyst will need the appropriate access rights in order to perform the installation, typically, using a command line. The latter can be a security concern (especially, if the server on which the notebook operates, also hosts other applications) and can also lead to corrupted systems if not performed correctly. The complexity of this step increases as the number of utility libraries, our analyst wants to use, increases. \eat{More specifically, for cases when an analyst needs to access data stored in a MongoDB and a MySQL database, two drivers will need to be installed.}
+
+\begin{figure*}[hbt!]
+\centering
+	\includegraphics[width=1\textwidth]{figures/reactive-processing2.pdf}
+	\caption{Demonstration of reactive charts. The reader's selection automatically updates both charts.}
+	\label{fig:reactive-data-processing}
+\end{figure*}
+
+
+Once the system is configured, the analyst needs to read lengthy documentation pages in order to properly issue queries to the employed database system, using the API of the respective library. This step typically requires the use of imperative code that interacts with the library. During this step, the analyst has to also specify the credentials that will be used for accessing the database system. In most such libraries, the credentials have to be inlined into the method call that establishes the connection with that system. While this would not be a security concern in a python (or any other) application (since the code that includes the credentials would have been compiled into a binary file, thus hiding the credentials), in a python notebook, the credentials would lie in plain sight for anyone, who has access to the notebook, to see.
 
 \noindent {\bf Data model conversions.}
 After, establishing the connection with the database system, and issuing the queries, the analyst, is able to consume the results by using the internal, to the library, datamodel. After doing so, the analyst has to again read documentation pages in order to infer the data model dictated by the visualization library she selected, and manually perform the appropriate conversions in order to construct the first visualization, by invoking the appropriate renderer function. Note that data model conversions have to take place every time the analyst wishes to integrate a third-party library in her analysis, so the amount of plumbing code required, can quickly skyrocket.
 
 
 \noindent {\bf Limited interactive exploratory capabilities.}
-The next step, is for the analyst to issue a query that counts the visitors per age group for a set of selected hours and construct a bar chart showing the result. Note, however, that there's no straightforward way for selecting a meaningful time frame. The analyst will have to go through a process of trial and error, by issuing an arbitrary number of such queries and plotting the results, until she finds a set that produces valuable insight. Furthermore, even if the analyst goes through this process for the data corresponding to a particular day, the time frame selection she made, might not produce any valuable insight for the dataset corresponding to another day. Additionally, the reader cannot test further hypotheses she might have.
+The next step, is for the analyst to issue a query that counts the visitors per age group for a set of selected hours and construct a bar chart showing the result. Note, however, that there's no straightforward way for selecting a meaningful time frame. The analyst will have to go through a process of trial and error, by issuing an arbitrary number of such queries and plotting the results, until she finds a set that produces valuable insight. Furthermore, even if the analyst goes through this process for the data corresponding to a particular day, the time frame selection she made, might not produce any valuable insight for the dataset corresponding to another day. Additionally, the reader cannot test further hypotheses that might come up.
 
-\subsubsection*{Discussion about reactive charts.} The use of co-dependent reactive charts would have been proven useful in this scenario. If the analyst was able to use a chart that allows the reader to select a particular range of hours by using the first plot, she could use that input in order to retrieve and plot only the user demographics for this particular range. Figure \ref{fig:reactive-data-processing} graphically depicts this process. The first figure shows the reader of the notebook, selecting a particular time frame; this causes the line chart to zoom in, thus showing only the selected time frame. After the update of the first chart, the subsequent bar chart is also updated thus only showing the age groups of the visitors in the selected time frame. This feature would add useful exploratory capabilities, to the notebook, which would be of great value to notebook readers. It would enable them to further analyze the dataset used by the notebook by simply interacting with the provided visualizations. 
+\subsection*{Discussion about reactive charts} The use of co-dependent reactive charts would have been proven useful in this scenario. If the analyst was able to use a chart that allows the reader to select a particular range of hours by using the first plot, she could use that input in order to retrieve and plot only the user demographics for this particular range. Figure \ref{fig:reactive-data-processing} graphically depicts this process. The first figure shows the reader of the notebook, selecting a particular time frame; this causes the line chart to zoom in, thus showing only the selected time frame. After the reader performs the selection on the first chart, the subsequent bar chart is also updated thus only showing the age groups of the users that visited the portal during the selected time frame. This feature would add useful exploratory capabilities, to the notebook, which would be of great value to notebook readers. It would enable them to further analyze the underlying dataset used by the notebook by simply interacting with the provided visualizations. 
 
 It is important to note that this feature cannot be implemented currently in interactive notebooks. Instead, the analyst would have to implement a full blown application in order to enable non-technical users interact with visualizations in this way. This requires more time and effort as well as technical expertise with web frameworks that data analysts, might lack. This reactive behavior requires the implementation of actions that have to be invoked when particular mouse events take place on the pixels of the browser that correspond to the visualization. Additionally, such events have to take place in a specific order (mousedown-mousemove-mouseup) for the action to be invoked. The developer of such applications must install observers that listen for such events and then provide the application logic that asynchronously accesses the back-end database to retrieve new data based on the user's selection and then cause the appropriate mutations to the respective visualizations that depend on that data. 
-\begin{figure}[]
-\centering
-	\includegraphics[width=0.7\columnwidth]{figures/reactive-processing.pdf}
-	\caption{Demonstration of reactive charts. The reader's selection automatically updates both charts.}
-	\label{fig:reactive-data-processing}
-\end{figure}
 
+
+ % Template and template instance figures
+ \begin{figure*}[hbt!]
+ \centering
+ %
+ %
+ \begin{minipage}[c]{6cm}
+ %
+ \begin{minipage}[c]{6cm}
+ \begin{code}
+ \textbf{<\% let} readings = 
+    SELECT count(time) as visits, time
+    FROM (SELECT * FROM page_views pv 
+   	     join visitors v 
+          on pv.v_id = v.vid) AS joined_table
+    GROUP BY time 
+    ORDER BY time ASC \textbf{\%>}
+ \end{code}
+ \vspace*{-0.4cm}
+ \subcaption{Data retrieval}
+ \label{figure:first-running-example:data-retrieval}
+ \vspace*{0.3cm}
+ \end{minipage}
  
+ 
+ 
+ \begin{minipage}[c]{6cm}
+ \begin{code}
+ readings = [
+    \{visits: 15, time: '08:00'\}, 
+    \{visits: 10, time: '09:00'\},
+    \{visits: 25, time: '10:00'\},  ...]
+ \end{code}
+ \vspace*{-0.4cm}
+ \subcaption{Query Result}
+ \label{figure:running-example:query-result}
+ \vspace*{0.3cm}
+ \end{minipage}
+ 
+ 
+ \begin{minipage}[c]{6cm}
+ \begin{code}
+    sources : [ \{ 
+      driver   : "postgres", 
+      host     : "edu.db.domain", 
+      expose   : [ \{
+       schema : 'website_info', 
+       tables: [visits, page_views] \} ]
+      port     : 5432, 
+      username : "dbadmin" 
+      password : 'myP@ss'
+    \}] 
+ \end{code}
+ \vspace*{-0.4cm}
+ \subcaption{DB Access Configuration file}
+ \vspace*{0.3cm}
+ \label{figure:source-config-file}
+ \end{minipage}
+ %
+ \vspace*{0.6cm}
+ \end{minipage}
+ \hspace{2cm}
+ \begin{minipage}[c]{6cm}
+ \begin{minipage}[c]{7.5cm}
+ \begin{code}
+   \directive{unit}{highcharts} \{
+     title: 'Visitor information' ,
+     type: 'line',
+     xAxis : \{ 
+       labels : ['08:00','09:00'...],
+       min : '08:00'
+       max : '22:00'
+     \}
+     series: [\{ data: [ \{y:15\}, \{y:10\}...] \}]
+   \} \directive{end unit}{}
+ \end{code}
+ \vspace*{-0.4cm}
+ \subcaption{Unit with evaluated unit state}
+ \vspace*{0.3cm}
+ \label{figure:running-example:unit-body}
+ \end{minipage}
+ \begin{minipage}[c]{7.5cm}
+ \begin{code}
+   \directive{unit}{highcharts} \{
+     title: 'Visitor information',
+     type: 'line',
+     xAxis : \{ 
+       labels : [
+         \directive{for}{reading \textbf{in} readings} 
+           \directive{print}{reading.time} 
+         \directive{end for}{}],
+       min : \directive{bind}{min_time},
+       max : \directive{bind}{max_time}
+     \}
+     series: [\{
+       data: [ \directive{for}{reading \textbf{in} readings}
+           \{
+             y  : \directive{print}{reading.count}
+           \}
+         \directive{end for}{} ]
+     \}]
+   \} \directive{end unit}{}
+ \end{code}
+ \vspace*{-0.3cm}
+ \subcaption{Template \texttt{temp\_view}}
+ \vspace*{0cm}
+ \label{figure:first-running-example:main-template}
+ \end{minipage}
+ \end{minipage}
+ \vspace*{-0.3cm}
+ \caption{Template, template instance, and UAS configuration file for the running example}
+ \vspace*{-0.3cm}
+ \end{figure*}
 
 \section{\projname\ Notebooks}
 
-\projname\ notebooks provide constructs that simplify the process described in the last section. Firstly, \projname\ notebooks support two types of modules that simplify data access and visualizations, namely: \textbf{source wrappers} and \textbf{visual units}. Since these modules come preinstalled with \projname\ notebooks, analysts do not need to install any third-party packages in order to retrieve or visualize data.
-
-% Template and template instance figures
-\begin{figure*}
-\centering
-%
-%
-\begin{minipage}[c]{6cm}
-%
-\begin{minipage}[c]{6cm}
-\begin{code}
-\textbf{<\% let} readings = 
-   SELECT count(time) as visits, time
-   FROM (SELECT * FROM page_views pv 
-  	     join visitors v 
-         on pv.v_id = v.vid) AS joined_table
-   GROUP BY time 
-   ORDER BY time ASC \textbf{\%>}
-\end{code}
-\vspace*{-0.4cm}
-\subcaption{Data retrieval}
-\label{figure:first-running-example:data-retrieval}
-\vspace*{0.3cm}
-\end{minipage}
+\projname\ notebooks provide constructs that simplify the process described in the last section. Firstly, \projname\ notebooks support two types of modules that streamline data access and visualizations, namely: \textbf{source wrappers} and \textbf{visual units}. Since these modules come preinstalled with \projname\ notebooks, analysts do not need to install any third-party packages in order to retrieve or visualize data.
 
 
-
-\begin{minipage}[c]{6cm}
-\begin{code}
-readings = [
-   \{visits: 15, time: '08:00'\}, 
-   \{visits: 10, time: '09:00'\},
-   \{visits: 25, time: '10:00'\},  ...]
-\end{code}
-\vspace*{-0.4cm}
-\subcaption{Query Result}
-\label{figure:running-example:query-result}
-\vspace*{0.3cm}
-\end{minipage}
-
-
-\begin{minipage}[c]{6cm}
-\begin{code}
-   sources : [ \{ 
-     driver   : "postgres", 
-     host     : "edu.db.domain", 
-     expose   : [ \{
-      schema : 'website_info', 
-      tables: [visits, page_views] \} ]
-     port     : 5432, 
-     username : "dbadmin" 
-     password : 'myP@ss'
-   \}] 
-\end{code}
-\vspace*{-0.4cm}
-\subcaption{DB Access Configuration file}
-\vspace*{0.3cm}
-\label{figure:source-config-file}
-\end{minipage}
-%
-\vspace*{0.6cm}
-\end{minipage}
-\hspace{2cm}
-\begin{minipage}[c]{6cm}
-\begin{minipage}[c]{7.5cm}
-\begin{code}
-  \directive{unit}{highcharts} \{
-    title: 'Visitor information' ,
-    type: 'line',
-    xAxis : \{ 
-      labels : ['08:00','09:00'...],
-      min : '08:00'
-      max : '22:00'
-    \}
-    series: [\{ data: [ \{y:15\}, \{y:10\}...] \}]
-  \} \directive{end unit}{}
-\end{code}
-\vspace*{-0.4cm}
-\subcaption{Unit with evaluated unit state}
-\vspace*{0.3cm}
-\label{figure:running-example:unit-body}
-\end{minipage}
-\begin{minipage}[c]{7.5cm}
-\begin{code}
-  \directive{unit}{highcharts} \{
-    title: 'Visitor information',
-    type: 'line',
-    xAxis : \{ 
-      labels : [
-        \directive{for}{reading \textbf{in} readings} 
-          \directive{print}{reading.time} 
-        \directive{end for}{}],
-      min : \directive{bind}{min_time},
-      max : \directive{bind}{max_time}
-    \}
-    series: [\{
-      data: [ \directive{for}{reading \textbf{in} readings}
-          \{
-            y  : \directive{print}{reading.count}
-          \}
-        \directive{end for}{} ]
-    \}]
-  \} \directive{end unit}{}
-\end{code}
-\vspace*{-0.3cm}
-\subcaption{Template \texttt{temp\_view}}
-\vspace*{0cm}
-\label{figure:first-running-example:main-template}
-\end{minipage}
-\end{minipage}
-\vspace*{-0.3cm}
-\caption{Template, template instance, and UAS configuration file for the running example}
-\vspace*{-0.3cm}
-\end{figure*}
 
 
 \subsubsection*{Source wrappers}
 
-Source wrappers allow the use of source specific languages for querying database systems (for instance SQL can be used to query MySQL and PostgreSQL databases, N1QL for Couchcase etc.). When using a \projname\ notebook, data analysts can directly provide a query on the notebook interface. This query is automatically used by the appropriate source wrapper, that evaluates it, propagates it to the respective data base system and returns the result in JSON format. This result is automatically assigned to a variable which can later be used in subsequent parts of the notebook (as will be described later in this section). Figure \ref{figure:first-running-example:data-retrieval} contains the first query of our analysis. It joins the two tables: $visitors$ and $page\_views$ on the id of the visitor, then groups the result on the $time$ attribute and runs a $count$ aggregate to count the visitors per unit of time. Lastly, it sorts the resulting dataset by time in ascending order and assigns the result into a \projname\ variable. Figure \ref{figure:running-example:query-result} shows the result of this query. Notice that the result has been converted into a JSON array by the respective source wrapper. 
+Source wrappers allow the use of source specific languages for querying database systems (for instance SQL can be used to query MySQL and PostgreSQL databases, N1QL for Couchbase etc.). When using a \projname\ notebook, data analysts can directly provide a query on the notebook interface. This query is automatically used by the appropriate source wrapper, that evaluates it, propagates it to the respective data base system and returns the result in JSON format. This result is automatically assigned to a variable which can later be used in subsequent parts of the notebook (as will be described later in this section). Figure \ref{figure:first-running-example:data-retrieval} contains the first query of the analysis that retrieves the dataset required to plot the chart shown in Figure \ref{figure:first-running-example:first-line-chart}. It joins the two tables: $visitors$ and $page\_views$ on the id of the visitor, then groups the result on the $time$ attribute and runs a $count$ aggregate to count the visitors per unit of time. Lastly, it sorts the resulting dataset by time in ascending order and assigns the result into a \projname\ variable. Figure \ref{figure:running-example:query-result} shows the result of this query. Notice that the result has been converted into a JSON array by the respective source wrapper. 
 
 In order for source wrappers to connect to the respective database systems, the data analyst must also provide a configuration file, describing the information required for establishing a connection with each source. Such configuration files are added from the interface of the notebook. Once added, these files are hidden from the UI and encrypted thus diminishing any security concerns. Figure \ref{figure:source-config-file} shows a sample configuration file that is used for accessing a postgres database that contains the data that will by used in our analysis. The configuration file must include the type of the database system, the host name, port and the credentials that will be used for obtaining a connection. Additionally, it must contain the database tables that will be accessible by queries. Only the tables that are explicitly defined in the configuration file will be accessible in the notebook. Once imported, this file is evaluated by the \projname\ engine and the schema of the accessible tables is displayed on the notebook, thus allowing the notebook user to get a glimpse of that information when generating the queries. 
+
+
+
 
 
 \subsubsection*{Visual Units}
@@ -414,14 +434,15 @@ the template shown in Figure \ref{figure:first-running-example:main-template} co
 \noindent{\bf Change Propagation Algorithm.}\\
 Once a diff is generated for each mutated variable \projname\ invokes the change propagation algorithm. Algorithm \ref{algo:change-propagation-algorithm2} summarizes this change propagation algorithm. The algorithm takes as input a set of diffs, and invokes the reevaluation of all statements that depend on the targeted variables. Specifically, it iterates over each statement of each coding snippet that appears in the notebook (as shown in line 2) and performs the following checks:
 
-\begin{itemize}
+\begin{compactitem}
+
 \item If the statement defines a new variable $x$ (line 3), then the algorithm visits every sub-expression of the \gl{let} directive and checks if it is targeted by any diff in D (line 4). If there is, the change propagation algorithm causes the reevaluation of the $\gl{let}$ statement (line 5), updates the notebook environment with the new value of x (line 6) and lastly constructs a new diff that targets x (line 7)
 
 \item If the statement constructs a visualization using a visual unit of type U with body B (line 8), then the algorithm visits every sub-expression in body B and checks if it is targeted by any diff in D (line 9). If there is, the change propagation algorithm causes the reevaluation of the entire body B, thus generating the unit instance r and then reinvokes the unit U with new unit instance (line 10).
 
 
 
-\end{itemize}
+\end{compactitem}
 
 \eat{
 
