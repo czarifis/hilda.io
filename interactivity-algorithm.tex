@@ -12,7 +12,38 @@
     \SetKwFunction{instantiateVmPayload}{instantiateVmPayload}
     \SetKwFunction{instantiateForLoopVmPayload}{instantiateForLoopVmPayload}
     \Function{\changepropagation{Notebook $N$, Environment $env$, Set of Input Diffs $D$}}{
-    	\For {\textbf{each} statement s in each block of N}{
+    	\For {\textbf{each} statement s in each coding snippet of N}{
+	    		 \uIf  {s is $\gl{<\% let } x \gl{ = } E \gl{ \%>}$ } {
+	    		  \uIf  {There is $\Delta^{}(t) \in D$ with $t$ that targets any subexpression of E} {
+	    		    Reevaluate $E$ and assign result $r$ to $x$\;
+	    		    Update $env$ with new value of $x$\;
+	    		    Construct $\Delta^{}(x)$ and add it to D\;
+	    		 }
+    		 }
+			 \uElseIf  {s is $\gl{<\%unit } U \gl{\%> } B \gl{ <\%end unit\%>}$ } {
+			 	\uIf  {There is $\Delta^{}(t) \in D$ with $t$ that that targets any subexpression of B} {
+			  		Reevaluate $B$ and invoke unit U with result $r$ \;
+			 	}
+             }    
+        }
+        
+    }
+\caption{Change Propagation Algorithm}
+\label{algo:change-propagation-algorithm2}
+\end{algorithm}
+
+\begin{algorithm}[t!]
+    \SetKwProg{Function}{function}{}{}
+    \SetKwFunction{changepropagation}{change-propagation}
+    \SetKwFunction{IVMPath}{IVMPath}
+    \SetKwFunction{prefixDiffs}{prefixDiffs}
+    \SetKwFunction{navigate}{navigate}
+    \SetKwFunction{keysWithin}{keysWithin}
+    \SetKwFunction{instantiateTemplate}{instantiateTemplate}
+    \SetKwFunction{instantiateVmPayload}{instantiateVmPayload}
+    \SetKwFunction{instantiateForLoopVmPayload}{instantiateForLoopVmPayload}
+    \Function{\changepropagation{Notebook $N$, Environment $env$, Set of Input Diffs $D$}}{
+    	\For {\textbf{each} statement s in each coding snippet of N}{
 	    		 \uIf  {s is $\gl{<\% let } x \gl{ = } E \gl{ \%>}$ and E contains \\directive: \gl{<\%}\text{\textbf{for} $v$ \textbf{in} $E''$}\gl{\%>} B \gl{<\%}\text{\textbf{end for}}\gl{\%>} \\or directive: $\gl{<\% }\text{\textbf{print} $E'$}\gl{ \%>}$ } {
 	    		  \uIf  {There is $\Delta^{}(t; p) \in D$ with $t$ that matches $E'$ or $E''$} {
 	    		    Reevaluate $E$ and assign result $r$ to $x$\;
