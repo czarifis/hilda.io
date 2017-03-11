@@ -1,5 +1,6 @@
 %\documentclass{sig-alternate}
 \documentclass[numbers]{sigplanconf}
+%\documentclass[sigconf]{acmart} 
 \input{preamble}
 
 % Use either package to make commentary public or private. If commentary is
@@ -7,6 +8,8 @@
 \usepackage{commentary-public}
 %\usepackage{commentary-arxiv-private}
 \usepackage{tabularx}
+\usepackage{sectsty}
+\usepackage{titlecaps}
 \usepackage{caption,subcaption}																																		
 % Prodromou: Use for comments during collaboration. Turn off by uncommenting "remarkfalse"
 \input{remark}
@@ -14,6 +17,7 @@
 %\remarkfalse																																														
 \usepackage{hhline}
 %\usepackage{amsmath}
+\usepackage{times}
 % \usepackage{commentary-arxiv-private}https://preview.overleaf.com/public/zckgmbcqqxpd/images/f848aee704bdc6b4fb1a2d1d3c4a093089841ee3.jpeg
 
 % ACM: Package to generate and customize Algorithm as per ACM style
@@ -145,6 +149,8 @@
 
 \begin{document}
 
+\sectionfont{\MakeUppercase}
+
 \newcommand{\projname}[0]{ViDeTTe}
 \newcommand{\angular}[0]{AngularJS}
 \newcommand{\react}[0]{React}
@@ -169,13 +175,15 @@
 \begin{sloppypar}
 
 %\input{abstract-AP}
-\input{abstract}
-
-\input{introduction-AP}
+%\input{abstract}
+\input{abstract2}
+%\input{introduction-AP}
+\input{introduction-AP2}
 \input{running-example}
-\input{traditional-notebooks}
+%\input{traditional-notebooks}
+\input{traditional-notebooks2}
 \input{vidette-notebooks}
-
+\input{vidette-notebooks2}
 %\input{external-interface}
 
 
