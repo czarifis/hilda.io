@@ -11,7 +11,9 @@
    \vspace*{0.1cm}
   \includegraphics[width=0.8\columnwidth]{figures/first-bar.png}
   \caption{Bar chart showing age groups of visitors}
+  \vspace{-10pt}
   \label{figure:first-running-example:first-bar-chart}
+  
 \end{figure}
 
 \begin{table}
@@ -62,7 +64,7 @@ Consider a data analyst, working for a news portal website. The analyst wishes t
 }
 
 
-For this analysis, we assume that the news portal maintains information about its reader-base in a Postgres database system. Table \ref{tab:schema} shows a potential database schema, that could be used for storing visitor information. The database contains two tables, namely ``Page Views" and ``Visitors"; table ``Visitors" contains information about each reader, such as the reader id, name, lastname, username and age. The table ``Page Views" maintains a tuple for each visit, and it consists of a visit id, the visitor id (foreign key referencing the visitor), the url of the visited page and the hour and date in which the user visited the website. The reader information could have been retrieved, with their permission, from various social media services (such as Facebook, Google etc). In order to construct this notebook, the data analyst must (a) retrieve  website access information from the database, by joining the two tables on the visitor id (b) generate a plot that shows the number of users that visit the website during the day, (c) issue a query that counts the number of visitors per age group, for each potential set of selected hours, and (d) create a bar chart that shows the number of visitors per age group. 
+For this analysis, we assume that the news portal maintains information about its reader-base in a Postgres database. Table \ref{tab:schema} shows a potential schema, that could be used for storing visitor information. The database contains two tables, namely ``Page Views" and ``Visitors"; table ``Visitors" contains information about each reader, such as the reader id, name, lastname, username and age. The table ``Page Views" maintains a tuple for each visit, and it consists of a visit id, the visitor id (foreign key referencing the visitor), the url of the visited page and the hour and date in which the user visited the website. The reader information could have been retrieved, with their permission, from various social media services (such as Facebook, Google etc). In order to construct this notebook, the data analyst must (a) retrieve  website access information from the database, by joining the two tables on the visitor id (b) generate a plot that shows the number of users that visit the website during the day, (c) issue a query that counts the number of visitors per age group, for each potential set of selected hours, and (d) create a bar chart that shows the number of visitors per age group. 
 
 
 

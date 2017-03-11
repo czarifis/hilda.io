@@ -5,8 +5,8 @@
 
 % Use either package to make commentary public or private. If commentary is
 % private, they will also be stripped by arxiv-sanitize.sh.
-\usepackage{commentary-public}
-%\usepackage{commentary-arxiv-private}
+%\usepackage{commentary-public}
+\usepackage{commentary-arxiv-private}
 \usepackage{tabularx}
 \usepackage{sectsty}
 \usepackage{titlecaps}
@@ -157,10 +157,17 @@
 
 \title{\projname\ Interactive Notebooks}
 
-\authorinfo{Name2\and Name3}
-           {Affiliation2/3}
-           {Email2/3}
+\authorinfo{Konstantinos Zarifis}
+           {University of California, San Diego}
+           {zarifis@cs.ucsd.edu}
            
+\authorinfo{Andreas Prodromou}
+           {University of California, San Diego}
+           {aprodrom@cs.ucsd.edu}
+\authorinfo{Yannis Papakonstantinou}
+           {University of California, San Diego}
+           {yannis@cs.ucsd.edu}           
+                      
 \maketitle
 
 
@@ -182,7 +189,7 @@
 \input{running-example}
 %\input{traditional-notebooks}
 \input{traditional-notebooks2}
-\input{vidette-notebooks}
+%\input{vidette-notebooks}
 \input{vidette-notebooks2}
 %\input{external-interface}
 
@@ -213,10 +220,20 @@
 %\input{programming-model}
 
 \end{sloppypar}
-\bibliographystyle{abbrvnat}
+
+
+\bibliographystyle{abbrv}
+{
+%\small
+\scriptsize 
+\bibliography{refs}
+}
+
+
+%\bibliographystyle{abbrvnat}
 %\softraggedright
 %\bibliographystyle{abbrv}
 
-\bibliography{refs}
+%\bibliography{refs}
 
 \end{document}
