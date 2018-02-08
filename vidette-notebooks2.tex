@@ -1,11 +1,11 @@
-
+\vspace*{-0.4cm}
 \section{\projname\ Notebooks}
 
 \projname\ notebooks provide constructs that facilitate the process of building interactive notebooks. \eat{\yannis{out: ``simplify the process described in the last section."} }Beginning with the features that pertain to data analysts, \projname\ notebooks support two types of modules that streamline data access and visualizations, namely: \textbf{source wrappers} and \textbf{visual units}. Since these modules come preinstalled with \projname\ notebooks, analysts do not need to install any third-party packages in order to retrieve or visualize data. \eat{\yannis{IMPORTANT: I wouldn't finish the list of contributions at this point because it sounds as if the contribution is libraries. Academia is almost never good at doing this and even UCSD is good at doing this, people will ask ``show me the system then"}}
 
 
 
-
+\vspace*{-0.4cm}
 \subsubsection*{Source wrappers}
 
 Source wrappers allow the use of source specific languages for querying database systems (for instance SQL can be used to query MySQL and PostgreSQL databases, N1QL for Couchbase etc.). When using a \projname\ notebook, data analysts can directly issue queries from the notebook interface. This query is directed to the appropriate source wrapper, that evaluates it, propagates it to the respective data base system and returns the result in JSON format. This result is automatically assigned to a variable which can later be used in subsequent parts of the notebook (as will be described later in this section). Figure \ref{figure:first-running-example:data-retrieval} contains the first query of the analysis that retrieves the dataset required to plot the chart shown in Figure \ref{figure:first-running-example:first-line-chart} \eat{\yannis{Out: It joins the two tables: $visitors$ and $page\_views$ on the id of the visitor, then groups the result on the $time$ attribute and runs a $count$ aggregate to count the visitors per unit of time. Lastly, it sorts the resulting dataset by time in ascending order and assigns the result into a \projname\ variable.} }and assigns the result into a \projname\ variable. Once this query is entered into a notebook coding block and evaluated it returns the dataset shown in Figure \ref{figure:running-example:query-result}. Notice that the result has been converted into a JSON array by the respective source wrapper. 
@@ -13,7 +13,7 @@ Source wrappers allow the use of source specific languages for querying database
 \yannis{aren't the configuration files virtually identical to those used by application servers in order to create virtual data sources? We spent too much space on it, turning the paper into manual. I'd like to cut and just point to the figure. Perhaps keep only the security and encryption aspect.} In order for source wrappers to connect to the respective database systems, the data analyst must also provide a configuration file, describing the information required for establishing a connection with each source. Such configuration files are added from the interface of the notebook (into a configuration file coding block). Once added, these files are hidden from the UI and encrypted thus diminishing any security concerns. Figure \ref{figure:source-config-file} shows a sample configuration file that is used for accessing a postgres database that contains the data that will by used in our analysis. The configuration file must include the type of the database system, the host name, port and the credentials that will be used for obtaining a connection. Additionally, it must contain the database tables that will be accessible by queries. Only the tables that are explicitly defined in the configuration file will be accessible in the notebook. Once imported, this file is evaluated by the \projname\ engine and the schema of the accessible tables is displayed on the notebook, thus allowing the notebook user to get a glimpse of that information when generating the queries. 
 
 
-
+\vspace*{-0.4cm}
 \subsubsection*{Visual Units}
 \eat{Once data analysts have obtained the data with the use of source wrappers, they can feed them into visual units in order to generate the respective visualizations. }Visual units are constructs capable of generating fully reactive visualizations, that take advantage of the advanced interactive capabilities of modern browsers. In the eyes of an analyst a visual unit is simply a black box that takes as input a JSON value that describes the state of the visualization. This JSON value is called \emph{unit instance}. The visual unit internally uses the unit instance to invoke the appropriate renderer calls that will generate the expected visualization. A particular instantiation of the unit  can be described as $\gl{<\% unit } U \gl{ \%> } v \gl{ <\% end unit \%>}$, where $U$ the type of the visual unit and $v$ the JSON value corresponding to the unit instance. Figure \ref{figure:running-example:unit-body} shows the unit instance of type \texttt{highcharts}, that once added to a coding block generates the visualization shown in Figure \ref{figure:first-running-example:first-line-chart}. The unit instance describes all the information that will be displayed in the visualization (such as the type and title of the chart, the labels on the x axis and so on). Each visual unit, comes with a unit instance schema that describes the format of the unit instance. As the reader interacts with visualizations, she can trigger mutations in the unit instance. For example, if the reader selects a particular area of the chart generated by the unit instance shown in Figure \ref{figure:running-example:unit-body}, the min and max attributes (in lines 6-7) will be updated accordingly.
 \yannis{Two major problems:\\
@@ -99,6 +99,7 @@ age_groups = [
 \vspace*{-0.3cm}
 \end{figure*}
 
+\vspace*{-0.3cm}
 \subsubsection*{Templates}
 \label{section:template}
 
@@ -172,7 +173,7 @@ age_groups = [
 }
 
 
-Despite the fact that both source wrappers and visual units use the JSON data model, data scientists often need to perform additional computation or simply transformations on JSON data. In order to facilitate this process, without requiring the use of imperative logic, \projname\ provides a declarative template language that operates on JSON data. \eat{\yannis{Mpaxalo...} }Formally, \emph{Templates} are declarative specifications that can be used to generate JSON objects, parameterized queries or unit instances, given a set of JSON variables as input. The template language supports a set of \emph{template directives}, all of which operate on the JSON data model. Due to lack of space we do not include a formal definition of the grammar, instead we simply describe each of them in detail and provide a concrete example that illustrates their use. 
+Despite the fact that both source wrappers and visual units use the JSON data model, data scientists often need to perform additional computation or simply transformations on JSON data. In order to facilitate this process, without requiring the use of imperative logic, \projname\ provides a declarative template language that operates on JSON data. ViDeTTe's template language utilizes the syntax of FORWARD \cite{SIGMOD2010, CIDR2011}, which, in turn, is similar to many prior template languages. However, the semantics are different and tuned for notebooks. See Section~\ref{section:related-work} for a comparison. \eat{\yannis{Mpaxalo...} }Formally, \emph{Templates} are declarative specifications that can be used to generate JSON objects, parameterized queries or unit instances, given a set of JSON variables as input. The template language supports a set of \emph{template directives}, all of which operate on the JSON data model. Due to lack of space we do not include a formal definition of the grammar, instead we simply describe each of them in detail and provide a concrete example that illustrates their use. 
 
 
 
@@ -198,6 +199,7 @@ This event invokes an internal propagation algorithm (which will be described in
 
 For instance, the template shown in Figure \ref{figure:first-running-example:main-template} contains two variables, namely $min\_time$ and $max\_time$, which are bound to the $min$ and $max$ unit instance attributes respectively. These variables are later used in the parameterized query shown in Figure \ref{figure:running-example:age-group-data-retrieval} which retrieves information about the users that visited the website in the time-frame specified by $min\_time$ and $max\_time$, groups the result in age groups and sums up the visits made by each age group. Figure \ref{figure:running-example:age-group-query-result}, contains the result of that query. This result is assigned to variable $age\_groups$ which is then used to produce the bar chart appearing in Figure \costas{add Figure} (the template shown in Figure \ref{figure:running-example:age-group-template} shows the template that created that chart)
 }
+\vspace*{-0.4cm}
 \subsubsection*{Internal Data Model \&  Propagation Algorithm}
 \label{section:change-propagation-datamodel}
 
@@ -231,7 +233,9 @@ For instance, the template shown in Figure \ref{figure:first-running-example:mai
         
     }
 \caption{Change Propagation Algorithm}
+
 \label{algo:change-propagation-algorithm2}
+\vspace*{-0.1cm}
 \end{algorithm} 
 
 
@@ -344,8 +348,6 @@ age_groups = [
 \vspace*{-0.3cm}
 \end{figure*}
 }
-
-
 \eat{
 \begin{itemize}
 \item First, if the statement defines a new variable $x$ by using a $\gl{let}$ directive, and the expression of $\gl{let}$ contains at least one reporting directive (either a $\gl{for}$ or a $\gl{print}$), then the algorithm checks whether there is a diff that targets any of the expressions of the reporting directives. If there is, the change propagation algorithm causes the reevaluation of the $\gl{let}$ statement, updates the notebook environment with the new value of x and constructs a new diff that targets x
@@ -354,11 +356,6 @@ age_groups = [
 
 \end{itemize}
 }
-
-
-%\input{interactivity-algorithm}
-
-
 \eat{
 
 This template language allows the invocation of functions. Regardless of whether these functions are defined by users or by third-party packages they must operate on the JSON data model, in order to be used in a template.
